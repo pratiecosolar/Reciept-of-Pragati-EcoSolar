@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Receipt / Invoice</title>
+<style>
+  :root{
+    --accent:#0b5cff;
+    --text:#222;
+    --muted:#666;
+    --paper:#fff;
+    --card-bg:#f8f9fb;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  body{
+    background:#e9eef7;
+    padding:20px;
+    color:var(--text);
+  }
+  .container{
+    max-width:900px;
+    margin:0 auto;
+  }
+  .receipt{
+    background:var(--paper);
+    padding:26px;
+    border-radius:8px;
+    box-shadow:0 6px 20px rgba(15,30,70,0.08);
+  }
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    margin-bottom:18px;
+  }
+  .brand{
+    display:flex;
+    gap:14px;
+    align-items:center;
+  }
+  .logo{
+    width:110px;height:70px;border-radius:6px;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(180deg,#e7efff,#dbe8ff);
+    border:1px solid rgba(11,92,255,0.06);
+    font-weight:700;color:var(--accent);
+    font-size:14px;
+  }
+  .company{
+    line-height:1;
+  }
+  .company h2{margin:0;font-size:18px;}
+  .company p{margin:0;color:var(--muted);font-size:13px;}
+
+  .meta{
+    text-align:right;
+    min-width:230px;
+    font-size:13px;
+  }
+  .meta .date{font-weight:600;font-size:14px}
+  .meta .small{color:var(--muted);font-size:12px}
+
+  .section{
+    margin-top:8px;
+    display:flex;
+    justify-content:space-between;
+    gap:16px;
+    align-items:flex-start;
+  }
+
+  .to {
+    flex:1;
+  }
+  .subject {
+    flex:1;
+    text-align:right;
+    color:var(--muted);
+    font-size:13px;
+  }
+
+  table.items{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:14px;
+    font-size:14px;
+  }
+  table.items thead th{
+    text-align:left;padding:10px 8px;border-bottom:2px solid #eef3fb;color:var(--muted);
+    font-weight:600;font-size:13px;
+  }
+  table.items tbody td{
+    padding:10px 8px;border-bottom:1px dashed #eef3fb;
+    vertical-align:middle;
+  }
+  .qty,input[type="number"]{width:80px}
+  .text-right{text-align:right}
+  tfoot tr td{padding:8px;font-weight:600}
+  .muted{color:var(--muted);font-weight:500}
+  .signature{
+    margin-top:70px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .signature .left{color:var(--muted)}
+  .signature .signed{
+    text-align:right;
+    min-width:240px;
+  }
+  .btns{
+    margin:14px 0 20px;
+    display:flex;
+    gap:10px;
+  }
+  .btn{
+    padding:8px 12px;border-radius:6px;border:0;background:var(--accent);color:#fff;font-weight:600;cursor:pointer;
+  }
+  .btn.secondary{background:#6b7280}
+  .small-input{
+    border:1px dashed transparent;background:transparent;padding:2px 6px;border-radius:4px;
+    font-weight:600;
+  }
+
+  /* Editable look */
+  [contenteditable]{outline:none;padding:2px;border-radius:3px}
+  input[type="text"], input[type="number"], textarea{
+    font-family:inherit;font-size:14px;padding:6px;border:1px solid #e6eefb;border-radius:6px;
+  }
+
+  /* Print */
+  @media print{
+    body{background:white}
+    .btns,.add-row-btn, .remove-row {display:none}
+    .receipt{box-shadow:none;border:0}
+    .container{padding:0}
+    header{margin-bottom:6px}
+  }
+
+  /* Add/remove row icons */
+  .row-actions{display:flex;gap:6px;align-items:center}
+  .add-row-btn{margin-left:4px;padding:6px 8px;border-radius:6px;border:0;background:#10b981;color:white;cursor:pointer}
+  .remove-row{background:#ef4444;color:white;border:0;padding:6px 8px;border-radius:6px;cursor:pointer}
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="btns">
+      <button class="btn" id="calcBtn">Calculate</button>
+      <button class="btn secondary" id="resetBtn">Reset Sample</button>
+      <button class="btn" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <div class="receipt" id="receipt">
+      <header>
+        <div class="brand">
+          <div class="logo" contenteditable="true"><img src="https://avatars.githubusercontent.com/u/238157330?v=4" alt="" height="100%" width="100%"></div>
+          <div class="company">
+            <h2 contenteditable="true" id="companyName">Pragati EcoSolar</h2>
+            <p contenteditable="true" id="companyAddr">HIG -42, Marutivilla Phase 1, Aryapalli, KIIT Road, Pati, Bhubaneswar - 751024</p>
+            <p style="margin-top:6px;font-size:13px"><span contenteditable="true" id="companyPhone">+91 96920 97145</span> • <span contenteditable="true" id="companyWeb">Solarbee.co.in</span></p>
+          </div>
+        </div>
+
+        <div class="meta">
+          <div class="date">Date: <span id="dateField" contenteditable="true"></span></div>
+          <div class="small">Receipt No: <span id="receiptNo" contenteditable="true">PE-2025-001</span></div>
+        </div>
+      </header>
+
+      <div class="section">
+        <div class="to">
+          <strong>To:</strong>
+          <div contenteditable="true" id="toName">Name- </div>
+          <div contenteditable="true" id="toAddr" style="margin-top:6px;color:var(--muted)">Location- </div>
+          <div contenteditable="true" id="toContact">Contact- </div>
+        </div>
+        <div class="subject">
+          <div><strong>Subject:</strong></div>
+          <div contenteditable="true" id="subjectText">Receipt</div>
+          <div style="margin-top:8px;color:var(--muted);font-size:13px" contenteditable="true" id="subtitle">Our fees of solar installation is Two lakh Ten Thousand rupees for installation of 3kw on grid solar system.</div>
+        </div>
+      </div>
+
+      <table class="items" id="itemsTable">
+        <thead>
+          <tr>
+            <th style="width:6%">#</th>
+            <th style="width:46%">Item Description</th>
+            <th style="width:16%">Qty</th>
+            <th style="width:16%">Rate (₹)</th>
+            <th style="width:16%" class="text-right">Total (₹)</th>
+          </tr>
+        </thead>
+        <tbody id="itemsBody">
+          <tr>
+            <td>1</td>
+            <td contenteditable="true" class="desc">3kw Ongrid Solar System</td>
+            <td><input type="number" class="qty" value="1" min="0" /></td>
+            <td><input type="number" class="rate" value="210000" min="0" /></td>
+            <td class="text-right lineTotal">210000</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top:8px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <button class="add-row-btn" id="addRowBtn">+ Add item</button>
+        </div>
+      </div>
+
+      <div style="clear:both"></div>
+
+      <div class="signature">
+        <div class="left">
+          <div contenteditable="true"><strong>Best Regards,</strong></div>
+          <div contenteditable="true" style="margin-top:8px">SolarBee</div>
+          <div contenteditable="true" style="margin-top:6px;color:var(--muted)">Operation Executive, Pratap Ku. Das</div>
+        </div>
+        <div class="signed">
+          <div style="height:54px;border-bottom:1px dashed #dfeaf8;width:220px;margin-left:auto"></div>
+          <div style="margin-top:8px;font-size:13px;color:var(--muted)">Authorized Signature</div>
+        </div>
+      </div>
+
+      <div style="margin-top:18px;color:var(--muted);font-size:13px">
+        <strong>Notes:</strong> <span contenteditable="true">Delivery: Within 7–10 days from order confirmation.</span>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Initialize date to current date in dd/mm/yyyy
+  (function initDate(){
+    const d = new Date();
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const yyyy = d.getFullYear();
+    document.getElementById('dateField').textContent = dd + '/' + mm + '/' + yyyy;
+  })();
+
+  function formatINR(n){
+    // simple grouping with commas
+    return '₹ ' + Number(n).toLocaleString('en-IN');
+  }
+
+  function calculateTotals(){
+    const tbody = document.getElementById('itemsBody');
+    const rows = tbody.querySelectorAll('tr');
+    let subtotal = 0;
+    rows.forEach((r, idx) => {
+      const qty = Number(r.querySelector('.qty').value) || 0;
+      const rate = Number(r.querySelector('.rate').value) || 0;
+      const line = qty * rate;
+      const lineCell = r.querySelector('.lineTotal');
+      if(lineCell) lineCell.textContent = formatINR(line);
+      subtotal += line;
+      // update index
+      r.cells[0].textContent = idx+1;
+    });
+
+    const gst = 0; // leave at 0 by default; user can change
+    const grand = subtotal + gst;
+    document.getElementById('subTotal').textContent = formatINR(subtotal);
+    document.getElementById('gstAmount').textContent = formatINR(gst);
+    document.getElementById('grandTotal').textContent = formatINR(grand);
+
+    // Keep loan & margin aligned: if user changed totals, they can adjust fields below
+    const loanInp = document.getElementById('loanAmount');
+    const marginInp = document.getElementById('marginPayment');
+
+    // If current loan + margin doesn't match subtotal, update margin to match difference (but only if values were the default sample).
+    const loan = Number(loanInp.value) || 0;
+    const margin = Number(marginInp.value) || 0;
+    if(loan + margin !== subtotal){
+      // do not override if user edited manually; but we'll set margin to subtotal - loan
+      marginInp.value = Math.max(0, subtotal - loan);
+    }
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', calculateTotals);
+
+  // Add row
+  document.getElementById('addRowBtn').addEventListener('click', function(){
+    const tbody = document.getElementById('itemsBody');
+    const rowCount = tbody.querySelectorAll('tr').length;
+    const tr = document.createElement('tr');
+
+    tr.innerHTML = `
+      <td>${rowCount+1}</td>
+      <td contenteditable="true" class="desc">Item description</td>
+      <td><input type="number" class="qty" value="1" min="0" /></td>
+      <td><input type="number" class="rate" value="0" min="0" /></td>
+      <td class="text-right lineTotal">₹ 0</td>
+    `;
+    // Add remove button cell using double click on row
+    tbody.appendChild(tr);
+
+    // attach simple listener: recalc when qty or rate change
+    tr.querySelector('.qty').addEventListener('input', calculateTotals);
+    tr.querySelector('.rate').addEventListener('input', calculateTotals);
+
+    // double-click to remove
+    tr.addEventListener('dblclick', function(){
+      if(confirm('Remove this row?')){
+        tr.remove();
+        calculateTotals();
+      }
+    });
+  });
+
+  // Recalc live when qty/rate edited
+  document.querySelectorAll('.qty, .rate').forEach(inp => {
+    inp.addEventListener('input', calculateTotals);
+  });
+
+  // Reset to sample content from provided PDF
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    document.getElementById('logoText').textContent = 'SolarBee';
+    document.getElementById('companyName').textContent = 'SolarBee';
+    document.getElementById('companyAddr').textContent = 'HIG -42, Marutivilla Phase 1, Aryapalli, KIIT Road, Pati, Bhubaneswar - 751024';
+    document.getElementById('companyPhone').textContent = '+91 96920 97145';
+    document.getElementById('companyWeb').textContent = 'Solarbee.co.in';
+    document.getElementById('toName').textContent = 'Udaya Singh Banara';
+    document.getElementById('toAddr').textContent = 'Jajapur';
+    document.getElementById('subjectText').textContent = 'Receipt';
+    document.getElementById('subtitle').textContent = 'Our Fees of solar installation is Two lakh Ten Thousand rupees for installation of 3kw on grid solar system.';
+    document.getElementById('receiptNo').textContent = 'RB-2025-001';
+
+    const tbody = document.getElementById('itemsBody');
+    tbody.innerHTML = `
+      <tr>
+        <td>1</td>
+        <td contenteditable="true" class="desc">3kw Ongrid Solar System</td>
+        <td><input type="number" class="qty" value="1" min="0" /></td>
+        <td><input type="number" class="rate" value="210000" min="0" /></td>
+        <td class="text-right lineTotal">₹ 210,000</td>
+      </tr>
+    `;
+    document.getElementById('loanAmount').value = 189000;
+    document.getElementById('marginPayment').value = 21000;
+    // attach listeners
+    document.querySelectorAll('.qty, .rate').forEach(inp => {
+      inp.addEventListener('input', calculateTotals);
+    });
+    calculateTotals();
+  });
+
+  // Initial calculation
+  calculateTotals();
+</script>
+</body>
+</html>
