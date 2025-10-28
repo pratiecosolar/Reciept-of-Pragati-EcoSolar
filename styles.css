@@ -79,7 +79,7 @@ table.items td[contenteditable="true"] { background: #fffef6; }
 .footer { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 28px; align-items: start; }
 .regards { font-weight: 600; }
 .signature-block { justify-self: start; text-align: left; margin-top: 16px; }
-.signature { width: 180px; height: 64px; object-fit: contain; border-bottom: 1px solid var(--border); }
+.signature { width: 300px; height: 150px; object-fit: contain; border-bottom: 1px solid var(--border); }
 .sign-caption { font-size: 13px; margin-top: 4px; }
 
 /* Responsive */
@@ -95,5 +95,6 @@ table.items td[contenteditable="true"] { background: #fffef6; }
   .receipt { border: none; border-radius: 0; padding: 16mm; max-width: none; }
   table.items th { background: #fff; }
 }
+
 
 
