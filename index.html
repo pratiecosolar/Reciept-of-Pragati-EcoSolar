@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pragati EcoSolar - Receipt Generator</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand"> 
+      <img id="logoPreview" alt="Logo" class="logo" src=""/>
+      <div>
+        <h1>PRAGATI ECOSOLAR</h1>
+        <p class="subtitle">Receipt Generator</p>
+      </div>
+    </div>
+    <div class="actions">
+      <label class="btn outline">
+        Upload Logo
+        <input id="logoInput" type="file" accept="image/*" hidden>
+      </label>
+      <label class="btn outline">
+        Upload Signature
+        <input id="signInput" type="file" accept="image/*" hidden>
+      </label>
+      <button id="generateBtn" class="btn primary">Generate Receipt</button>
+      <button id="printBtn" class="btn">Print / Save PDF</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel form-panel no-print">
+      <h2>Fill Details</h2>
+      <form id="receiptForm" autocomplete="on">
+        <div class="grid">
+          <div class="field">
+            <label>Customer Name</label>
+            <input id="custName" type="text" placeholder="Name" required>
+          </div>
+          <div class="field">
+            <label>Customer Address</label>
+            <input id="custAddress" type="text" placeholder="Address" required>
+          </div>
+          <div class="field">
+            <label>System Size (kW)</label>
+            <input id="systemKw" type="number" step="0.1" placeholder="System Size" required>
+          </div>
+          <div class="field">
+            <label>Total Amount (₹)</label>
+            <input id="totalAmount" type="number" step="1" placeholder="Total Amount" required>
+          </div>
+          <div class="field">
+            <label>Loan Amount (₹)</label>
+            <input id="loanAmount" type="number" step="1" placeholder="Loan Amount">
+          </div>
+          <div class="field">
+            <label>Margin Amount (₹)</label>
+            <input id="marginAmount" type="number" step="1" placeholder="Margin Amount">
+          </div>
+          <div class="field full">
+            <label>Item Description (line 1)</label>
+            <input id="item1" type="text" placeholder="Item Description">
+          </div>
+        </div>
+      </form>
+      <p class="hint">Tip: Values auto-format. You can still edit totals directly in the preview table.</p>
+    </section>
+
+    <section class="panel preview-panel">
+      <div id="receipt" class="receipt a4">
+        <div class="receipt-header">
+          <div class="left">
+            <img id="logoOut" alt="Logo" class="logo large" src="">
+            <div class="company-name">PRAGATI ECOSOLAR</div>
+          </div>
+          <div class="right">
+            <div class="contact-row">📞 +91 9124318222</div>
+            <div class="contact-row">🌐 pragatiecosolar.in</div>
+            <div class="contact-row">📍 HIG-42, Marutivilla Phase 1, Aryapalli, KIIT Road, Patia, Bhubaneswar - 751024</div>
+            <div class="date-row"><strong>Date:</strong> <span id="today"></span></div>
+          </div>
+        </div>
+
+        <div class="to-block">
+          <div><strong>To:</strong></div>
+          <div id="toName">—</div>
+          <div id="toAddr">—</div>
+        </div>
+
+        <div class="subject"><strong>Subject:</strong> Receipt</div>
+
+        <p class="message" id="messageText"></p>
+
+        <table class="items">
+          <thead>
+            <tr>
+              <th>Item Description</th>
+              <th>Qty</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td contenteditable="true" id="row1desc">3kw Ongrid Solar System</td>
+              <td>1</td>
+              <td contenteditable="true" id="row1total">₹2,10,000</td>
+            </tr>
+            <tr>
+              <td>Loan Amount</td>
+              <td>-</td>
+              <td contenteditable="true" id="row2total">₹1,89,000</td>
+            </tr>
+            <tr>
+              <td>Margin Payment</td>
+              <td>-</td>
+              <td contenteditable="true" id="row3total">₹21,000</td>
+            </tr>
+          </tbody>
+        </table>
+
+         <div class="footer">
+           <div class="regards">Best Regards, Pragati EcoSolar</div>
+           <div class="signature-block">
+             <img id="signOut" alt="Signature" class="signature" src="">
+             <div class="sign-caption">Operation Executive, Pratap Ku. Das</div>
+           </div>
+         </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+
